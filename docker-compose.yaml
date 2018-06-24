@@ -1,0 +1,49 @@
+version: '3'
+services:
+  app:
+    build:
+      context: ./docker/app
+      dockerfile: Dockerfile
+    image: docker-demo/app:latest
+    networks:
+      - appnet
+    volumes:
+      - .:/var/www/html
+    ports:
+      - ${APP_PORT}:80
+    working_dir: /var/www/html
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - appnet
+    volumes:
+      - dbdata:/var/lib/mysql
+  cache:
+    image: redis:alpine
+    networks:
+      - appnet
+    volumes:
+      - cachedata:/data
+    ports:
+      - ${DB_PORT}:3306
+  node:
+    build:
+      context: ./docker/node
+      dockerfile: Dockerfile
+    image: docker-demo/node:latest
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+networks:
+  appnet:
+    driver: bridge
+volumes:
+  dbdata:
+    driver: local
+  cachedata:
+    driver: local

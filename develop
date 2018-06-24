@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+if [ $# -gt 0 ]; then
+    case "$1" in
+        "start") docker-compose up -d;;
+        "stop") docker-compose down;;
+        "php") shift 1; docker-compose exec app php "$@";;
+        "composer") shift 1; docker-compose exec app composer "$@";;
+        "npm") shift 1; docker-compose run node npm "$@";;
+        *) docker-compose "$@";;
+    esac
+else
+    docker-compose ps
+fi
